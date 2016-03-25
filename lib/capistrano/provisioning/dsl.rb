@@ -85,6 +85,7 @@ module Capistrano
         return if user_exists?(username)
         cmd = "sudo adduser #{username}"
         cmd << " --password '#{options[:password]}'" if options[:password]
+        cmd << " --home-dir '#{options[:home]}'" if options[:home]
         execute(cmd)
       end
 
