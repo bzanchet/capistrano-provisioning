@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Bruno Zanchet"]
   spec.email         = ["bzanchet@gmail.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Use capistrano to install/update packages on you servers}
+  # spec.description   = %q{}
+  spec.homepage      = "https://github.com/bzanchet/capistrano-provisioning"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
@@ -30,4 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.11"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "minitest", "~> 5.0"
+
+  spec.add_dependency 'capistrano', '~> 3.4'
+
 end
