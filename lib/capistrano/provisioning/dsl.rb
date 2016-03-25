@@ -22,12 +22,11 @@ module Capistrano
         end
       end
 
-      def package(*packages)
-        packages.each do |package|
-          next if package_installed?(package)
-          cmd = "sudo yum install --quiet -y #{package}"
-          execute(cmd)
-        end
+      def package(package, options = {})
+        package_name = options[:name] || package
+        return if package_installed?(package_name, options[:version])
+        cmd = "sudo yum upgrade --quiet -y #{package}"
+        execute(cmd)
       end
 
       def package_group(*groups)
@@ -36,6 +35,11 @@ module Capistrano
           cmd = "sudo yum groupinstall --quiet -y '#{group}'"
           execute(cmd)
         end
+      end
+
+      def update
+        execute("yum clean all")
+        execute("sudo yum --quiet -y update")
       end
 
       def user(username, options = {})
@@ -55,8 +59,15 @@ module Capistrano
         test("yum groups list installed | grep -i '#{group}' > /dev/null")
       end
 
-      def package_installed?(package)
-        test("rpm -qi --quiet #{package}")
+      def package_installed?(package, version = nil)
+        return unless test("rpm -qi --quiet #{package}")
+        if version
+          installed_version = @context.capture("rpm -qa #{package} --queryformat '%{version}'")
+          version == installed_version
+        else
+          # no version given
+          true
+        end
       end
 
       def test(cmd)
@@ -72,7 +83,7 @@ module Capistrano
       end
 
       def user_exists?(username)
-        test("getent passwd #{username}")
+        test("getent passwd #{username} > /dev/null")
       end
     end
   end
