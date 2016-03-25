@@ -7,16 +7,6 @@ module Capistrano
         @context = context
       end
 
-      def sync_directory(path, options = {})
-        local_folder = "#{Dir.pwd}/files"
-        local_path = "#{local_folder}#{path}"
-        Dir.glob("#{local_path}/**/*") do |file|
-          unless FileTest.directory?(file)
-            file(file.gsub(local_folder, ""))
-          end
-        end
-      end
-
       # TODO: skip if md5sum matches
       # TODO: proper exception if local file not found
       def file(path, options = {})
@@ -43,7 +33,7 @@ module Capistrano
       def package(package, options = {})
         package_name = options[:name] || package
         return if package_installed?(package_name, options[:version])
-        cmd = "sudo yum upgrade --quiet -y #{package}"
+        cmd = "sudo yum install --quiet -y #{package}"
         execute(cmd)
       end
 
@@ -52,6 +42,25 @@ module Capistrano
           next if group_installed?(group)
           cmd = "sudo yum groupinstall --quiet -y '#{group}'"
           execute(cmd)
+        end
+      end
+
+      def service(service, options = {})
+        if options[:enable]
+          execute("sudo systemctl enable #{service}")
+        end
+        if options[:restart]
+          execute("sudo systemctl restart #{service}")
+        end
+      end
+
+      def sync_directory(path, options = {})
+        local_folder = "#{Dir.pwd}/files"
+        local_path = "#{local_folder}#{path}"
+        Dir.glob("#{local_path}/**/*") do |file|
+          if FileTest.file?(file)
+            file(file.gsub(local_folder, ""))
+          end
         end
       end
 
