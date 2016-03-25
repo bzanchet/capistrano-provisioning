@@ -7,6 +7,18 @@ module Capistrano
         @context = context
       end
 
+      def chmod(mode, *files)
+        execute("sudo chmod #{mode} #{files.join(" ")}")
+      end
+
+      def chown(owner, *files)
+        execute("sudo chown #{owner} #{files.join(" ")}")
+      end
+
+      def command(command)
+        execute(command)
+      end
+
       # TODO: skip if md5sum matches
       # TODO: proper exception if local file not found
       def file(path, options = {})
