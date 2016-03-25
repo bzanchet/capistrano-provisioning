@@ -7,7 +7,18 @@ module Capistrano
         @context = context
       end
 
+      def sync_directory(path, options = {})
+        local_folder = "#{Dir.pwd}/files"
+        local_path = "#{local_folder}#{path}"
+        Dir.glob("#{local_path}/**/*") do |file|
+          unless FileTest.directory?(file)
+            file(file.gsub(local_folder, ""))
+          end
+        end
+      end
+
       # TODO: skip if md5sum matches
+      # TODO: proper exception if local file not found
       def file(path, options = {})
         owner = options[:owner] || "root"
         cmd = "sudo -u #{owner} mkdir -p #{File.dirname(path)}"
@@ -85,6 +96,7 @@ module Capistrano
         @context.test(cmd)
       end
 
+      # TODO: we can do better than Dir.pwd
       def upload(path)
         tempfile = Tempfile.new("mytempfile", "/tmp")
         @context.upload!("#{Dir.pwd}/files#{path}", tempfile.path)
